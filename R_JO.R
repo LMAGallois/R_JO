@@ -162,3 +162,8 @@ JO%>%
 
 
 #------------------------------------------------------------------------------#
+#evolution Chine vs USA
+JO%>%
+  group_by(Country)%>%
+  filter(Year>= 1984 & (Country=='FRA'|Country=='CHN'))%>%
+  summarize(total=sum(Country=='FRA'|Country=='CHN'))
