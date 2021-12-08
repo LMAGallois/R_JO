@@ -1,3 +1,10 @@
+#------------------------------------------------------------------------------#
+#                  Les Jeux Olympiques depuis 1896                             #
+#                  Léonis GALLOIS & Auriane LARTIGUE                           #
+#                              5 SDBD A2                                       #
+#------------------------------------------------------------------------------#
+
+# Installation des packages
 install.packages("plyr")
 install.packages("dplyr")
 install.packages("tidyverse")
@@ -20,12 +27,13 @@ dict <- read.table(file = 'dataset/dictionary.csv', sep=',', header=TRUE)
 JO %>% 
     group_by(Year,Gender) %>%
     count(Gender) %>%
-    ggplot( aes(x=Year, y=n)) + geom_col(aes(fill= Gender)) +labs(y='Number of athletes')
+    ggplot( aes(x=Year, y=n)) + geom_col(aes(fill= Gender)) +
+    labs(y='Number of athletes')
 
 #------------------------------------------------------------------------------#
-# Est-ce-que des personnes portant le même prénom que nous ont gagné ?
-Athletes=unlist(strsplit(JO$Athlete, ", ")) # Names and surnames into a list
-names=Athletes[seq(2,length(Athletes), 2)] # Only names
+# Est-ce-que des personnes portant le même prénom que nous ont déjà gagné ?
+Athletes=unlist(strsplit(JO$Athlete, ", ")) # Noms et Prénoms dans une liste
+names=Athletes[seq(2,length(Athletes), 2)] # On conserve les prénoms
 'Alfred' %in% names # => TRUE
 'Auriane' %in% names # => FALSE
 'Leonie' %in% names # => FALSE
@@ -34,37 +42,53 @@ names=Athletes[seq(2,length(Athletes), 2)] # Only names
 
 #------------------------------------------------------------------------------#
 # Le prénom qui a le plus gagné de médailles
+# Hommes
 JO %>%
   group_by(Athlete)%>%
+  filter(Gender == "Men")%>%
   summarize(Names= unlist(strsplit(Athlete , ", "))[2]) %>%
   na.omit(Names) %>%
   count(Names) %>%
-  arrange(-n)
+  arrange(-n) %>% 
+  head(5)
+# Femmes
+JO %>%
+  group_by(Athlete)%>%
+  filter(Gender == "Women")%>%
+  summarize(Names= unlist(strsplit(Athlete , ", "))[2]) %>%
+  na.omit(Names) %>%
+  count(Names) %>%
+  arrange(-n) %>% 
+  head(5)
 
 #------------------------------------------------------------------------------#
 # Remplacer URSS par la Russie afin de pouvoir comparer aux fils des années
 JO[JO == "URS"] <- "RUS"
 
-# Nombre de médailles gagnés par pays  (toutes années confonfues)
+# Nombre de médailles gagnées par pays  (toutes années confondues)
 JO %>%
   group_by(Country) %>%
   count(Country)%>%
   arrange(-n) %>%
   head(10)%>%
-  ggplot( aes(x=Country, y=n)) + geom_col(aes(fill= n))+labs(y="Number of medals") 
+  ggplot( aes(x=Country, y=n)) + geom_col(aes(fill= n))+
+  labs(y="Number of medals") 
 
 #------------------------------------------------------------------------------#
-# Nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
+# Nombre d'épreuves par type de sports en 2012 et 1896 
+# 2012
 JO %>%
   filter(Year == 2012)%>%
   summarise(Sport,Event)%>%
   unique()%>% 
   count(Sport) -> Sport_2012
+# 1896
 JO %>%
   filter(Year == 1896)%>%
   summarise(Sport,Event)%>%
   unique()%>% 
   count(Sport) -> Sport_1896
+# Merge des deux dataframes dans Sport
 Sport <- merge(Sport_1896,Sport_2012,by="Sport",all=TRUE)
 Sport <- rename(Sport,c('1896'='n.x','2012'='n.y'))
 Sport[is.na(Sport)] <- 0 
@@ -86,8 +110,6 @@ JO %>%
 #------------------------------------------------------------------------------#
 # Les pays riches ont-ils le plus de champions ?
 
-dict %>% mutate(rankGDP=dense_rank(desc(-GDP.per.Capita)))
-
 JO %>% 
   group_by(Country) %>%
   filter(Year == 2012)%>%
@@ -96,12 +118,10 @@ JO %>%
   merge(dict, by=c('Code'), all.x = TRUE, all.y=TRUE)%>%
   select(-c(Country, Population))%>%
   na.omit()%>%
-  mutate(rankGDP=dense_rank(-GDP.per.Capita),rankMedals=dense_rank(-Medals), rank = dense_rank(rankGDP + rankMedals )) %>%
-  arrange(rank)%>% 
-  head(20)%>%
-  ggplot( aes(x=Code, y=rank))  +
-  geom_col()+coord_flip()
-
+  ggplot( aes(x=GDP.per.Capita, y=Medals))  +
+  geom_point() +
+  geom_smooth(method=lm,se=FALSE)+
+  labs(x="GDP per capita in 2012", y="Number of medals")
 
 #------------------------------------------------------------------------------#
 # # Evolution du nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
