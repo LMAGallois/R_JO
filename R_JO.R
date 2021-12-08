@@ -20,7 +20,7 @@ dict <- read.table(file = 'dataset/dictionary.csv', sep=',', header=TRUE)
 JO %>% 
     group_by(Year,Gender) %>%
     count(Gender) %>%
-    ggplot( aes(x=Year, y=n)) + geom_col(aes(fill= Gender)) 
+    ggplot( aes(x=Year, y=n)) + geom_col(aes(fill= Gender)) +labs(y='Number of athletes')
 
 #------------------------------------------------------------------------------#
 # Est-ce-que des personnes portant le même prénom que nous ont gagné ?
@@ -51,7 +51,7 @@ JO %>%
   count(Country)%>%
   arrange(-n) %>%
   head(10)%>%
-  ggplot( aes(x=Country, y=n)) + geom_col(aes(fill= n)) 
+  ggplot( aes(x=Country, y=n)) + geom_col(aes(fill= n))+labs(y="Number of medals") 
 
 #------------------------------------------------------------------------------#
 # Nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
@@ -81,7 +81,7 @@ JO %>%
   unique() %>% 
   count(Year)%>%
   ggplot(aes(x = Year, y = n, group = 1)) + geom_line(linetype = "dashed", color = "steelblue")+
-  geom_point(color = "steelblue")
+  geom_point(color = "steelblue")+labs(y="Number of athletes")
 
 #------------------------------------------------------------------------------#
 # Les pays riches ont-ils le plus de champions ?
@@ -104,16 +104,16 @@ JO %>%
 
 
 #------------------------------------------------------------------------------#
-# Evolution du nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
-JO %>%
-  group_by(Sport, Discipline) %>%
-  filter(Year == 1896) %>%
-  count(Sport) %>%
-  ggplot(aes(x = "", y=n, fill = Sport)) +
-  geom_bar(width = 1, stat = "identity", color = "white") +
-  coord_polar("y", start = 0) +
-  geom_text(aes(y = n, label = n), color = "white", position=position_stack(vjust = 0.5))+
-  theme_void()
+# # Evolution du nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
+# JO %>%
+#   group_by(Sport, Discipline) %>%
+#   filter(Year == 1896) %>%
+#   count(Sport) %>%
+#   ggplot(aes(x = "", y=n, fill = Sport)) +
+#   geom_bar(width = 1, stat = "identity", color = "white") +
+#   coord_polar("y", start = 0) +
+#   geom_text(aes(y = n, label = n), color = "white", position=position_stack(vjust = 0.5))+
+#   theme_void()
 
 #------------------------------------------------------------------------------#
 
@@ -127,7 +127,7 @@ JO%>%
   arrange(-n)%>%
   head(10)%>%
   ggplot(aes(x="", y=n, fill=Event))+ geom_bar(width=1, stat = 'identity',color = 'white')+coord_polar('y', start=0)+
-  geom_text(aes( label=n), position=position_stack(vjust = 0.5))+theme_void()
+  geom_text(aes( label=n), position=position_stack(vjust = 0.5))+theme_void()+labs(title="Number of French men athletes by sport event") 
 
 JO%>%
   group_by(Country, Event)%>%
@@ -138,4 +138,7 @@ JO%>%
   arrange(-n)%>%
   head(10)%>%
   ggplot(aes(x="", y=n, fill=Event))+ geom_bar(width=1, stat = 'identity',color = 'white')+coord_polar('y', start=0)+
-  geom_text(aes( label=n), position=position_stack(vjust = 0.5))+theme_void()
+  geom_text(aes( label=n), position=position_stack(vjust = 0.5))+theme_void() +labs(title="Number of French women athletes by sport event") 
+
+
+#------------------------------------------------------------------------------#
