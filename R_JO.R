@@ -112,16 +112,28 @@ JO %>%
   ggplot(aes(x = "", y=n, fill = Sport)) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar("y", start = 0) +
-  geom_text(aes(y = n, label = n), color = "white")+
+  geom_text(aes(y = n, label = n), color = "white", position=position_stack(vjust = 0.5))+
   theme_void()
 
+#------------------------------------------------------------------------------#
+
 # En tant que français, dans quelle discipline a t-on le plus de chance d'exceller ?
-colors = c("red", "yellow", "green", "violet", "orange", "blue", "pink", "cyan", "black", "grey") 
 JO%>%
   group_by(Country, Event)%>%
 #  filter(Year=='2012')%>%
   filter(Country=='FRA')%>%
   filter(Gender=='Men')%>%
+  count(Event)%>%
+  arrange(-n)%>%
+  head(10)%>%
+  ggplot(aes(x="", y=n, fill=Event))+ geom_bar(width=1, stat = 'identity',color = 'white')+coord_polar('y', start=0)+
+  geom_text(aes( label=n), position=position_stack(vjust = 0.5))+theme_void()
+
+JO%>%
+  group_by(Country, Event)%>%
+  #  filter(Year=='2012')%>%
+  filter(Country=='FRA')%>%
+  filter(Gender=='Women')%>%
   count(Event)%>%
   arrange(-n)%>%
   head(10)%>%
