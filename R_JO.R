@@ -1,3 +1,9 @@
+install.packages("plyr")
+install.packages("dplyr")
+install.packages("tidyverse")
+install.packages("tidyr")
+install.packages("ggplot2")
+
 library(dplyr)
 library(plyr)
 library(tidyverse)
@@ -20,10 +26,10 @@ JO %>%
 # Est-ce-que des personnes portant le même prénom que nous ont gagné ?
 Athletes=unlist(strsplit(JO$Athlete, ", ")) # Names and surnames into a list
 names=Athletes[seq(2,length(Athletes), 2)] # Only names
-'Alfred' %in% surnames # => TRUE
-'Auriane' %in% surnames # => FALSE
-'Leonie' %in% surnames # => FALSE
-'Gilles$' %in% surnames # => FALSE
+'Alfred' %in% names # => TRUE
+'Auriane' %in% names # => FALSE
+'Leonie' %in% names # => FALSE
+'Gilles$' %in% names # => FALSE
 #Attention une personne s'appelle 'gillespi',le dollar marque la fin du mot
 
 #------------------------------------------------------------------------------#
@@ -39,7 +45,7 @@ JO %>%
 # Remplacer URSS par la Russie afin de pouvoir comparer aux fils des années
 JO[JO == "URS"] <- "RUS"
 
-#Nombre de médailles gagnés par pays  (toutes années confonfues)
+# Nombre de médailles gagnés par pays  (toutes années confonfues)
 JO %>%
   group_by(Country) %>%
   count(Country)%>%
@@ -48,7 +54,7 @@ JO %>%
   ggplot( aes(x=Country, y=n)) + geom_col(aes(fill= n)) 
 
 #------------------------------------------------------------------------------#
-# Nb d'épreuves par type de sports en 2012 et 1896 pour comparer
+# Nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
 JO %>%
   filter(Year == 2012)%>%
   summarise(Sport,Event)%>%
@@ -77,7 +83,23 @@ JO %>%
   ggplot(aes(x = Year, y = n, group = 1)) + geom_line(linetype = "dashed", color = "steelblue")+
   geom_point(color = "steelblue")
 
-
+#------------------------------------------------------------------------------#
+# Les pays riches ont-ils le plus de champions ?
+dict$rankGDP <- NA
+dict$rankGDP[order(-dict$GDP.per.Capita)] <- 1:nrow(dict)
+JO %>% 
+  group_by(Country) %>%
+  filter(Year == 2012)%>%
+  count(Country)%>%
+  rename(Code=Country)%>%
+  merge(dict, by=c('Code'), all.x = TRUE, all.y=TRUE)%>%
+  select(-c(Country, Population))%>%
+  na.omit()%>%
+  mutate(Quotient=n/GDP.per.Capita*1000)%>%
+  arrange(-Quotient)%>% 
+  head(20)%>%
+  ggplot( aes(x=Code, y=Quotient))  +
+  geom_col()+coord_flip()
 
 
 #------------------------------------------------------------------------------#
