@@ -162,7 +162,7 @@ JO%>%
 
 
 #------------------------------------------------------------------------------#
-#evolution Chine vs USA
+#evolution Chine vs france
 JO%>%
   group_by(Country)%>%
   filter(Year>= 1984 & (Country=='FRA'|Country=='CHN'))%>%
