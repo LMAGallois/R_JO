@@ -85,20 +85,21 @@ JO %>%
 
 #------------------------------------------------------------------------------#
 # Les pays riches ont-ils le plus de champions ?
-dict$rankGDP <- NA
-dict$rankGDP[order(-dict$GDP.per.Capita)] <- 1:nrow(dict)
+
+dict %>% mutate(rankGDP=dense_rank(desc(-GDP.per.Capita)))
+
 JO %>% 
   group_by(Country) %>%
   filter(Year == 2012)%>%
   count(Country)%>%
-  rename(Code=Country)%>%
+  rename(Code=Country, Medals=n)%>%
   merge(dict, by=c('Code'), all.x = TRUE, all.y=TRUE)%>%
   select(-c(Country, Population))%>%
   na.omit()%>%
-  mutate(Quotient=n/GDP.per.Capita*1000)%>%
-  arrange(-Quotient)%>% 
+  mutate(rankGDP=dense_rank(-GDP.per.Capita),rankMedals=dense_rank(-Medals), rank = dense_rank(rankGDP + rankMedals )) %>%
+  arrange(rank)%>% 
   head(20)%>%
-  ggplot( aes(x=Code, y=Quotient))  +
+  ggplot( aes(x=Code, y=rank))  +
   geom_col()+coord_flip()
 
 
