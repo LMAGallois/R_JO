@@ -166,4 +166,6 @@ JO%>%
 JO%>%
   group_by(Country)%>%
   filter(Year>= 1984 & (Country=='FRA'|Country=='CHN'))%>%
-  summarize(total=sum(Country=='FRA'|Country=='CHN'))
+  summarize(totalFR=sum(Country=='FRA'),totalCHN=sum(Country=='CHN') )
+#FR: 482
+#CHN: 807
