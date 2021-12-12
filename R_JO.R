@@ -86,13 +86,13 @@ JO%>%
 # 2012
 JO %>%
   filter(Year == 2012)%>%
-  summarise(Sport,Event)%>%
+  summarise(Sport,Event,Gender)%>%
   unique()%>% 
   count(Sport) -> Sport_2012
 # 1896
 JO %>%
   filter(Year == 1896)%>%
-  summarise(Sport,Event)%>%
+  summarise(Sport,Event,Gender)%>%
   unique()%>% 
   count(Sport) -> Sport_1896
 # Merge des deux dataframes dans Sport
