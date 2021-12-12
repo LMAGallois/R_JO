@@ -5,14 +5,12 @@
 #------------------------------------------------------------------------------#
 
 # Installation des packages
-install.packages("plyr")
 install.packages("dplyr")
 install.packages("tidyverse")
 install.packages("tidyr")
 install.packages("ggplot2")
 
 library(dplyr)
-library(plyr)
 library(tidyverse)
 library(tidyr)
 library(ggplot2)
@@ -50,7 +48,7 @@ JO %>%
   na.omit(Names) %>%
   count(Names) %>%
   arrange(-n) %>% 
-  head(5)
+  head(5) -> Men_names
 # Femmes
 JO %>%
   group_by(Athlete)%>%
@@ -59,7 +57,7 @@ JO %>%
   na.omit(Names) %>%
   count(Names) %>%
   arrange(-n) %>% 
-  head(5)
+  head(5) -> Women_names
 
 #------------------------------------------------------------------------------#
 # Remplacer URSS par la Russie afin de pouvoir comparer aux fils des années
@@ -73,6 +71,15 @@ JO %>%
   head(10)%>%
   ggplot( aes(x=Country, y=n)) + geom_col(aes(fill= n))+
   labs(y="Number of medals") 
+
+# La Chine n'est arrivé qu'en 1984
+# Evolution Chine vs France 
+JO%>%
+  group_by(Country)%>%
+  filter(Year>= 1984 & (Country=='FRA'|Country=='CHN'))%>%
+  summarize(total=sum(Country=='FRA')+sum(Country=='CHN'))
+# FR: 482
+# CHN: 807
 
 #------------------------------------------------------------------------------#
 # Nombre d'épreuves par type de sports en 2012 et 1896 
@@ -96,7 +103,7 @@ Sport %>%
   pivot_longer(c('1896','2012'),names_to="Year",values_to = "N") %>%
   ggplot( aes(x=Sport, y=N)) + geom_col(aes(fill= Year)) +
   coord_flip()+
-  labs(title="Number of events by Sport",caption="Data of 1896 and 2012",x="Sport",y="Number of Events") 
+  labs(title="Number of events by Sport",x="Sport",y="Number of Events") 
 
 #------------------------------------------------------------------------------#  
 # Evolution du nombre de pays participant aux JO
@@ -105,11 +112,10 @@ JO %>%
   unique() %>% 
   count(Year)%>%
   ggplot(aes(x = Year, y = n, group = 1)) + geom_line(linetype = "dashed", color = "steelblue")+
-  geom_point(color = "steelblue")+labs(y="Number of athletes")
+  geom_point(color = "steelblue")+labs(y="Number of countries")
 
 #------------------------------------------------------------------------------#
 # Les pays riches ont-ils le plus de champions ?
-
 JO %>% 
   group_by(Country) %>%
   filter(Year == 2012)%>%
@@ -124,19 +130,6 @@ JO %>%
   labs(x="GDP per capita in 2012", y="Number of medals")
 
 #------------------------------------------------------------------------------#
-# # Evolution du nombre d'épreuves par type de sports en 2012 et 1896 pour comparer
-# JO %>%
-#   group_by(Sport, Discipline) %>%
-#   filter(Year == 1896) %>%
-#   count(Sport) %>%
-#   ggplot(aes(x = "", y=n, fill = Sport)) +
-#   geom_bar(width = 1, stat = "identity", color = "white") +
-#   coord_polar("y", start = 0) +
-#   geom_text(aes(y = n, label = n), color = "white", position=position_stack(vjust = 0.5))+
-#   theme_void()
-
-#------------------------------------------------------------------------------#
-
 # En tant que français, dans quelle discipline a t-on le plus de chance d'exceller ?
 JO%>%
   group_by(Country, Event)%>%
@@ -159,13 +152,4 @@ JO%>%
   head(10)%>%
   ggplot(aes(x="", y=n, fill=Event))+ geom_bar(width=1, stat = 'identity',color = 'white')+coord_polar('y', start=0)+
   geom_text(aes( label=n), position=position_stack(vjust = 0.5))+theme_void() +labs(title="Number of French women athletes by sport event") 
-
-
 #------------------------------------------------------------------------------#
-#evolution Chine vs france
-JO%>%
-  group_by(Country)%>%
-  filter(Year>= 1984 & (Country=='FRA'|Country=='CHN'))%>%
-  summarize(totalFR=sum(Country=='FRA'),totalCHN=sum(Country=='CHN') )
-#FR: 482
-#CHN: 807
