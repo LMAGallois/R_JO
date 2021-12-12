@@ -85,7 +85,7 @@ JO%>%
 # Nombre d'épreuves par type de sports en 2012 et 1896 
 # 2012
 JO %>%
-  filter(Year == 2012)%>%
+  filter(Year == 2012, Sport == 'Tennis')%>%
   summarise(Sport,Event,Gender)%>%
   unique()%>% 
   count(Sport) -> Sport_2012
