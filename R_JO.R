@@ -83,15 +83,17 @@ JO%>%
 
 #------------------------------------------------------------------------------#
 # Nombre d'épreuves par type de sports en 2012 et 1896 
+# Attention à ne pas compter les sports mixtes
 # 2012
 JO %>%
-  filter(Year == 2012, Sport == 'Tennis')%>%
+  filter(Year == 2012)%>%
+  mutate(Gender = ifelse(grepl("Mixed", Event , fixed = TRUE), "Mixed", Gender))%>%
   summarise(Sport,Event,Gender)%>%
   unique()%>% 
   count(Sport) -> Sport_2012
 # 1896
 JO %>%
-  filter(Year == 1896)%>%
+  filter(Year == 1896) %>%
   summarise(Sport,Event,Gender)%>%
   unique()%>% 
   count(Sport) -> Sport_1896
